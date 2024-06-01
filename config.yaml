@@ -1,0 +1,84 @@
+baseURL: https://jmdaweb.github.io
+languageCode: es-es
+title: Un sitio solicitado por la comunidad, para la comunidad
+theme: indiefeed
+
+# How many feed entries to load at once
+paginate: 12
+
+taxonomies:
+  category: categorias
+  tag: etiquetas
+
+author:
+  name: José Manuel Delicado Alcolea
+  image: # relative to static/
+  about: hablo de tecnología, accesibilidad y, si surge, de cualquier otra cosa
+  nickname: "@jmdaweb"
+  email: jmdaweb@hotmail.com
+  domain: https://jmdaweb.github.io
+
+params: # All of these are optional
+  # logo: heart.png # relative to ./static/
+  dateform: January 2, 2006
+  # customCSS: css/style.css # relative to ./static/
+  webmentionUrl: https://webmention.io/jmdaweb.github.io/webmention
+  pingbackUrl: https://webmention.io/jmdaweb.github.io/xmlrpc
+  micropubUrl: https://jmdaweb.github.io/.netlify/functions/micropub
+  microsubUrl: https://aperture.p3k.io/microsub/jmdaweb
+  # For IndieAuth
+  githubuser: jmdaweb
+  twitteruser: jmdaweb # no @ in front
+  mastodon: https://comunidad.nvda.es/@jmdaweb # full link to your instance profile
+  # monetization: $xxxxxxx # Web Monetization payment pointer
+  # socialImage: static/img/social.png
+
+mediaTypes:
+  "application/atom+xml":
+    suffixes:
+      - "xml"
+
+outputFormats:
+  Atom:
+    name: "Atom"
+    mediaType: "application/atom+xml"
+    # generated file: <baseName>.<mediaType."application/atom+xml".suffixes[0]> = atom.xml
+    baseName: "atom"
+    isPlainText: false
+    rel: "alternate"
+    isHTML: false
+    permalinkable: false
+  Json:
+    name: "Json"
+    mediaType: "application/json"
+    # generated file: <baseName>.<mediaType."application/feed+json".suffixes[0]> = feed.json
+    baseName: "feed"
+    isPlainText: false
+    rel: "alternate"
+    isHTML: false
+    permalinkable: false
+
+outputs:
+  home:
+    - HTML
+    - ATOM
+    - JSON
+    - RSS
+  page:
+    - HTML
+  section:
+    - HTML
+  taxonomy:
+    - HTML
+  term:
+    - HTML
+    - ATOM
+    - JSON
+    - RSS
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    style: dracula
