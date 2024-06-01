@@ -1,4 +1,4 @@
-baseURL: https://jmdaweb.github.io
+baseURL: https://jmdaweb.github.io/
 languageCode: es-es
 title: Un sitio solicitado por la comunidad, para la comunidad
 theme: indiefeed
@@ -13,7 +13,7 @@ taxonomies:
 author:
   name: José Manuel Delicado Alcolea
   image: # relative to static/
-  about: hablo de tecnología, accesibilidad y, si surge, de cualquier otra cosa
+  about: Hablo de tecnología, accesibilidad y, si surge, de cualquier otra cosa
   nickname: "@jmdaweb"
   email: jmdaweb@hotmail.com
   domain: https://jmdaweb.github.io
