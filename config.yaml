@@ -82,3 +82,4 @@ markup:
       unsafe: true
   highlight:
     style: dracula
+sectionPagesMenu: main

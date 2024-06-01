@@ -14,7 +14,8 @@
                 </a>
             </div>
             <div class="flex row">
-                <nav aria-label="Menú principal" class="flex row">
+{{ partial "menu.html" (dict "menuID" "main" "page" .) }}                
+<nav aria-label="Menú de formatos alternativos" class="flex row">
                     <ul class="flex row">
                         <li>
                             <a class="menu__item" href="{{ .Site.BaseURL }}">
