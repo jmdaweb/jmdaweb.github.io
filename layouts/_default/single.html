@@ -47,12 +47,12 @@
                     <article class="md p-summary p-name e-content">
                         {{ else if in .Params.Categories "reply" }}
                         <article class="md p-summary e-content">
-                            <h2 class="p-name reply-context"><a class="u-in-reply-to h-cite"
+                            <h1 class="p-name reply-context"><a class="u-in-reply-to h-cite"
                                     href="{{.Permalink}}">{{.Title}}</a>
-                            </h2>
+                            </h1>
                             {{ else }}
                             <article class="md p-summary e-content">
-                                <h2 class="p-name"><a href="{{.Permalink}}">{{.Title}}</a></h2>
+                                <h1 class="p-name"><a href="{{.Permalink}}">{{.Title}}</a></h1>
                                 {{ end }}
                                 {{.Content }}
                                 <!-- Bridgy -->

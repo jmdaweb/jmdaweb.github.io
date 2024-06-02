@@ -13,7 +13,7 @@ taxonomies:
 author:
   name: José Manuel Delicado Alcolea
   image: # relative to static/
-  about: Hablo de tecnología, accesibilidad y, si surge, de cualquier otra cosa
+  about: 
   nickname: "@jmdaweb"
   email: jmdaweb@hotmail.com
   domain: https://jmdaweb.github.io
@@ -82,4 +82,3 @@ markup:
       unsafe: true
   highlight:
     style: dracula
-sectionPagesMenu: main
