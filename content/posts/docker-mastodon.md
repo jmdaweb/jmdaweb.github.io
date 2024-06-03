@@ -8,7 +8,7 @@ tags:
 draft: false
 ---
 
-En este tutorial aprenderemos conceptos básicos de Docker. Después levantaremos una instancia de Mastodon, una red social descentralizada, y tomaremos medidas para que sea lo más segura posible.
+En este tutorial aprenderemos conceptos básicos de Docker. Después levantaremos una instancia de Mastodon, una red social descentralizada, y tomaremos medidas para que sea lo más segura posible. Dicha instancia estará formada por contenedores que operan de forma sincronizada, y que ofrecerán sus servicios al público mediante el servidor web Apache.
 
 ## Requisitos
 
