@@ -1,11 +1,11 @@
 ---
 title: "Cómo visualizar y crear archivos ZIM, una buena alternativa para almacenar sitios web fuera de línea"
-date: 2024-08-04T13:40:45+02:00
+date: 2024-08-04T19:40:45+02:00
 reply:
 uri: /posts/archivos-zim/
 categories: ["tutoriales"] # note, reply, anything else
 tags:
-draft: true
+draft: false
 ---
 
 Si buscas en cualquier buscador información para descargar sitios web completos, encontrarás montones de tutoriales que recomiendan toda clase de programas. Este es sólo uno más, que he querido escribir tras encontrarme por casualidad con el formato ZIM, el tipo de archivo que usa la Wikipedia para volcar todo su contenido y permitir su uso sin conexión. Pero espera, ¿quién querría descargar un sitio web entero y para qué? Tal vez, más personas de las que crees. Visitar un sitio web previamente descargado puede tener ventajas, como las siguientes:
@@ -29,7 +29,7 @@ Para seguir y comprender adecuadamente las distintas secciones de esta entrada, 
 ## Introducción al formato ZIM
 
 El [proyecto OpenZIM](https://wiki.openzim.org/wiki/OpenZIM) define el formato ZIM como "un formato de archivo perfectamente adecuado para guardar la Wikipedia en un pen drive USB". Pero parece que no sólo se aplica a la Wikipedia, sino a cualquier contenido en la web que pueda almacenarse sin conexión.
-Un archivo ZIM contiene en su interior ficheros HTML codificados en UTF-8, enlazados adecuadamente entre sí y con todos los recursos asociados: hojas de estilo, imágenes, contenido multimedia, ficheros descargables y scripts. Una web alojada en uno de estos archivos debe ser autocontenida, eliminando por completo o reduciendo al máximo la interactividad, los comportamientos dinámicos y la dependencia del exterior. Los archivos ZIM contienen metadatos sobre el nombre de la web, su creador, su idioma y una descripción del contenido, entre otros, y facilitan al software que los interpreta la posibilidad de realizar búsquedas de texto completo.
+Un archivo ZIM contiene en su interior ficheros HTML codificados en UTF-8, enlazados adecuadamente entre sí y con todos los recursos asociados: hojas de estilo, imágenes, contenido multimedia, ficheros descargables y scripts. Una web alojada en uno de estos archivos debe ser autosuficiente, eliminando por completo o reduciendo al máximo la interactividad, los comportamientos dinámicos y la dependencia del exterior. Los archivos ZIM contienen metadatos sobre el nombre de la web, su creador, su idioma y una descripción del contenido, entre otros, y facilitan al software que los interpreta la posibilidad de realizar búsquedas de texto completo.
 
 ## Cómo leer un archivo ZIM existente
 
@@ -92,3 +92,62 @@ Cada archivo, entre sus metadatos, tiene un identificador (id) formado por núme
 
 Si tienes iPhone, iPad o Mac, puedes [descargar Kiwix en la AppStore](https://apps.apple.com/us/app/kiwix/id997079563). En Android, se puede [descargar Kiwix en la Play Store](https://play.google.com/store/apps/details?id=org.kiwix.kiwixmobile&pli=1), pero está limitada y no permite abrir archivos ajenos a la biblioteca de Kiwix. Si necesitas esto último, [descarga el archivo APK directamente](https://download.kiwix.org/release/kiwix-android/kiwix.apk).
 
+## Cómo crear un archivo ZIM
+
+En la sección anterior se proporcionó un archivo ZIM de ejemplo con la web de complementos de NVDA en español alojada por la comunidad internacional, así como herramientas para procesarlo y acceder a su contenido. Ahora, crearemos ese mismo archivo. Para ello es necesario un sistema con Linux y Wget instalado. A diferencia de la sección anterior, esta parte la haremos más guiada.
+
+### Descarga de zimwriterfs
+
+Zimwriterfs es la herramienta que usaremos para crear archivos ZIM. Forma parte de las zim-tools, que no son tan comunes en los repositorios de las distribuciones como las kiwix-tools vistas antes.
+En primer lugar, descargamos la versión más reciente, actualmente la 3.4.2:
+
+* [Zim-tools para ARM64](https://download.openzim.org/release/zim-tools/zim-tools_linux-aarch64-3.4.2.tar.gz)
+* [Zim-tools para i586](https://download.openzim.org/release/zim-tools/zim-tools_linux-i586-3.4.2.tar.gz)
+* [Zim-tools para Linux x86_64](https://download.openzim.org/release/zim-tools/zim-tools_linux-x86_64-3.4.2.tar.gz)
+
+Asumiendo un sistema x86_64, descomprimimos el archivo descargado y navegamos a la carpeta extraída. Por ejemplo, en nuestra carpeta de usuario, se puede ejecutar este comando: `tar -zxf zim-tools_linux-x86_64-3.4.2.tar.gz && cd zim-tools_linux-x86_64-3.4.2`
+
+### Descarga del sitio web
+
+El siguiente paso es hacernos con todos los ficheros de la web que queremos. En la medida de lo posible, estos ficheros deben ser autosuficientes, sin dependencias del exterior. Si una web utiliza PHP para devolver contenido con demasiado dinamismo, o Ajax, es una Single Page Application o se apoya en Angular/VUE/React, probablemente no se pueda descargar por completo usando wget. Por suerte, la web de complementos de NVDA es estática y cumple todos los requisitos para funcionar fuera de línea.
+Con este comando, se descargará en una carpeta nueva en la ubicación donde nos encontramos: `wget -k -p -r -D addons.nvda-project.org https://addons.nvda-project.org/index.es.html`
+
+La descarga tardará unos minutos. Mientras tanto, veamos qué significa cada argumento del comando anterior:
+
+* `-r`: descargar de forma recursiva. Si no lo usamos, se descargaría sólo una página.
+* `-p`: descargar todos los requisitos necesarios para que la página funcione: imágenes, scripts, hojas de estilo, etc.
+* `-k`: cuando se complete la descarga, procesar los enlaces de todos los archivos para conectarlos entre sí.
+* `-D addons.nvda-project.org`: restringir las descargas al dominio addons.nvda-project.org. De lo contrario, ¡wget seguiría recursivamente todos los enlaces que encuentre y se descargaría medio Internet!
+
+### Preparación de otros recursos necesarios
+
+Zimwriterfs necesita que se le pasen varios argumentos obligatorios para funcionar. Uno de ellos corresponde a una ilustración de 48x48 en formato png, que no tenemos. Por tanto, debemos diseñarla o buscarla. Para este tutorial, se ha elegido el [icono de NVDA](/static/nvda.ico), se ha modificado su tamaño y se ha convertido en png. Hay muchos programas que facilitan esta tarea, como Irfanview. No profundizaremos en los pasos necesarios. Al finalizar la conversión, dejaremos el archivo [nvda.png](/static/nvda.png) dentro de la carpeta addons.nvda-project.org que contiene la web descargada en el paso anterior.
+
+### Creación del archivo ZIM
+
+Ya sólo faltan un par de comandos para completar la creación de nuestro archivo. Sin embargo, para prepararlos, debemos tener claros los metadatos. Esto es lo que zimwriterfs espera recibir obligatoriamente:
+
+* Un breve nombre interno.
+* El archivo html principal. En nuestro caso, `index.es.html`
+* La ruta a la ilustración del paso anterior.
+* Idioma: código de idioma en formato ISO639-3. Por ejemplo eng para inglés, fra para francés, o spa para español.
+* Título: un breve título de 30 caracteres o menos.
+* Descripción: una breve descripción del contenido.
+* El nombre del creador o creadores del contenido.
+* El nombre de la persona o entidad que publica el archivo ZIM.
+
+Y estos metadatos se pueden añadir de manera opcional:
+
+* Descripción extendida del contenido.
+* Etiquetas, separadas por el signo punto y coma.
+* URL de origen del contenido.
+* Variante. Por ejemplo, Wikipedia tiene las variantes maxi y mini, entre otras. Si sólo queremos un archivo por sitio web, no es necesario indicar este parámetro.
+
+Por supuesto, aquí opcional no hay nada. Vamos a crear un archivo con todos los metadatos. Primero, ejecutamos este comando para fijar una variable de entorno necesaria: `export MAGIC=/usr/lib/file/magic.mgc`
+Y ahora, llamamos a zimwriterfs: `zimwriterfs --name="nvdaaddons" --welcome=index.es.html --illustration=nvda.png --language=spa --title="Complementos para NVDA" --description="Sitio web en español de complementos de la comunidad de NVDA" --creator="Equipo de complementos de NVDA" --publisher="José Manuel Delicado" --source="https://addons.nvda-project.org" --tags="NVDA;complementos;lector de pantalla;accesibilidad" --longDescription="Sitio web de complementos de la comunidad internacional de NVDA, sólo contenidos en español e inglés" --flavour=NVDA ./addons.nvda-project.org nvda-addons.zim`
+Tras unos segundos, obtendremos un archivo ZIM muy similar al que se proporcionó al principio de este tutorial.
+
+## Conclusiones
+
+Tras leer las secciones anteriores, deberías saber leer y crear tus propios archivos ZIM. Nos hemos dejado por el camino algunos conceptos, como la creación de un proxy inverso, la ejecución de kiwix-serve como servicio, y el resto de herramientas disponibles en las kiwix-tools y las zim-tools. ¿Te animas a explorarlas? Si la respuesta es sí, ¡asómate por Mastodon y comparte lo que has descubierto!
+¡Hasta la próxima!
