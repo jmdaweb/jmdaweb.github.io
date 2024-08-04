@@ -33,7 +33,7 @@ Un archivo ZIM contiene en su interior ficheros HTML codificados en UTF-8, enlaz
 
 ## Cómo leer un archivo ZIM existente
 
-Aunque es un formato poco común, la [biblioteca de Kiwix](https://library.kiwix.org/) contiene montones de archivos ZIM que se pueden visualizar y descargar. La Wikipedia, por su parte, vuelca periódicamente todos sus contenidos en [esta dirección](https://dumps.wikimedia.org/other/kiwix/zim/wikipedia/). Y efectivamente, en un pen drive de 128 GB cabrían las versiones en inglés y español juntas con todos sus recursos. Pero en este tutorial trabajaremos con algo más manejable: un [pequeño archivo ZIM](/static/nvda-addons.zim) preparado para la ocasión. En la última sección aprenderemos a crearlo, pero ahora veamos cómo acceder a su contenido.
+Aunque es un formato poco común, la [biblioteca de Kiwix](https://library.kiwix.org/) contiene montones de archivos ZIM que se pueden visualizar y descargar. La Wikipedia, por su parte, vuelca periódicamente todos sus contenidos en [esta dirección](https://dumps.wikimedia.org/other/kiwix/zim/wikipedia/). Y efectivamente, en un pen drive de 128 GB cabrían las versiones en inglés y español juntas con todos sus recursos. Pero en este tutorial trabajaremos con algo más manejable: un [pequeño archivo ZIM](/nvda-addons.zim) preparado para la ocasión. En la última sección aprenderemos a crearlo, pero ahora veamos cómo acceder a su contenido.
 Existen varios programas que pueden abrir archivos ZIM. Se pueden descargar en el [catálogo de aplicaciones de Kiwix](https://kiwix.org/en/applications/). En general son fáciles de usar, y cada uno tiene sus ventajas y desventajas.
 
 ### Kiwix desktop
@@ -60,7 +60,7 @@ Las herramientas de consola de Kiwix (kiwix-tools) permiten realizar búsquedas,
 
 * [Windows (sólo 32 bits)](https://download.kiwix.org/release/kiwix-tools/kiwix-tools_win-i686-3.7.0-2.zip)
 * [Linux ARM64](https://download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-aarch64-3.7.0-2.tar.gz)
-* [Linux i686](https://download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-i586-3.7.0-2.tar.gz)
+* [Linux i586](https://download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-i586-3.7.0-2.tar.gz)
 * [Linux x86_64](https://download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-x86_64-3.7.0-2.tar.gz)
 
 De nuevo, no hace falta instalación. Tan sólo basta con descomprimir las herramientas en la carpeta deseada y ejecutar desde consola las que queramos. Por ejemplo, podemos usar kiwix-serve para servir por red el archivo ZIM descargado anteriormente con un comando como este:
@@ -121,7 +121,7 @@ La descarga tardará unos minutos. Mientras tanto, veamos qué significa cada ar
 
 ### Preparación de otros recursos necesarios
 
-Zimwriterfs necesita que se le pasen varios argumentos obligatorios para funcionar. Uno de ellos corresponde a una ilustración de 48x48 en formato png, que no tenemos. Por tanto, debemos diseñarla o buscarla. Para este tutorial, se ha elegido el [icono de NVDA](/static/nvda.ico), se ha modificado su tamaño y se ha convertido en png. Hay muchos programas que facilitan esta tarea, como Irfanview. No profundizaremos en los pasos necesarios. Al finalizar la conversión, dejaremos el archivo [nvda.png](/static/nvda.png) dentro de la carpeta addons.nvda-project.org que contiene la web descargada en el paso anterior.
+Zimwriterfs necesita que se le pasen varios argumentos obligatorios para funcionar. Uno de ellos corresponde a una ilustración de 48x48 en formato png, que no tenemos. Por tanto, debemos diseñarla o buscarla. Para este tutorial, se ha elegido el [icono de NVDA](/nvda.ico), se ha modificado su tamaño y se ha convertido en png. Hay muchos programas que facilitan esta tarea, como Irfanview. No profundizaremos en los pasos necesarios. Al finalizar la conversión, dejaremos el archivo [nvda.png](/nvda.png) dentro de la carpeta addons.nvda-project.org que contiene la web descargada en el paso anterior.
 
 ### Creación del archivo ZIM
 
