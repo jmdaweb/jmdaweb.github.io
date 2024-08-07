@@ -65,7 +65,7 @@ Las herramientas de consola de Kiwix (kiwix-tools) permiten realizar búsquedas,
 
 De nuevo, no hace falta instalación. Tan sólo basta con descomprimir las herramientas en la carpeta deseada y ejecutar desde consola las que queramos. Por ejemplo, podemos usar kiwix-serve para servir por red el archivo ZIM descargado anteriormente con un comando como este:
 
-`kiwix-serve nvda-addons.zim`
+`./kiwix-serve nvda-addons.zim`
 
 El contenido estará disponible en [localhost por el puerto 80](http://localhost), o en la dirección ip del servidor, si es un equipo remoto. El servidor kiwix-serve dispone de algunos parámetros extra que se pueden pasar al ejecutarlo:
 
@@ -144,7 +144,7 @@ Y estos metadatos se pueden añadir de manera opcional:
 * Variante. Por ejemplo, Wikipedia tiene las variantes maxi y mini, entre otras. Si sólo queremos un archivo por sitio web, no es necesario indicar este parámetro.
 
 Por supuesto, aquí opcional no hay nada. Vamos a crear un archivo con todos los metadatos. Primero, ejecutamos este comando para fijar una variable de entorno necesaria: `export MAGIC=/usr/lib/file/magic.mgc`
-Y ahora, llamamos a zimwriterfs: `zimwriterfs --name="nvdaaddons" --welcome=index.es.html --illustration=nvda.png --language=spa --title="Complementos para NVDA" --description="Sitio web en español de complementos de la comunidad de NVDA" --creator="Equipo de complementos de NVDA" --publisher="José Manuel Delicado" --source="https://addons.nvda-project.org" --tags="NVDA;complementos;lector de pantalla;accesibilidad" --longDescription="Sitio web de complementos de la comunidad internacional de NVDA, sólo contenidos en español e inglés" --flavour=NVDA ./addons.nvda-project.org nvda-addons.zim`
+Y ahora, llamamos a zimwriterfs: `./zimwriterfs --name="nvdaaddons" --welcome=index.es.html --illustration=nvda.png --language=spa --title="Complementos para NVDA" --description="Sitio web en español de complementos de la comunidad de NVDA" --creator="Equipo de complementos de NVDA" --publisher="José Manuel Delicado" --source="https://addons.nvda-project.org" --tags="NVDA;complementos;lector de pantalla;accesibilidad" --longDescription="Sitio web de complementos de la comunidad internacional de NVDA, sólo contenidos en español e inglés" --flavour=NVDA ./addons.nvda-project.org nvda-addons.zim`
 Tras unos segundos, obtendremos un archivo ZIM muy similar al que se proporcionó al principio de este tutorial.
 
 ## Conclusiones
