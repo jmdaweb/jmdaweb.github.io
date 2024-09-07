@@ -1,5 +1,6 @@
 <details>
 <summary>Información del autor</summary>
+
 Bien, conste que no hice este sitio para hablar de mí, pero si has desplegado este bloque es porque esperas encontrar algo más que entradas de blog relacionadas con la tecnología.
 
 Mi nombre es José Manuel. Soy ingeniero del software, y me gusta trabajar como consultor de accesibilidad. Adoro el software libre, los sistemas distribuidos y las soluciones descentralizadas que no dependen de grandes corporaciones para funcionar de forma autónoma. Ah, y además de eso soy ciego total, lo que significa que no veo absolutamente nada.

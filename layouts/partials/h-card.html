@@ -21,14 +21,14 @@
                 {{ with .Site.Params.twitteruser }} {{ $.Site.Params.separator | default "∙" }}
                 <a rel="me" href="https://x.com/{{ . }}">X</a>{{ end }}
             </address>
-            <p class="p-note">
+            <div class="p-note">
                 {{ $bio := "author/about.md" }}
                 {{ if (fileExists $bio) -}}
                 {{ readFile $bio | markdownify }}
                 {{ else }}
                 {{ .Site.Author.about }}
                 {{- end }}
-            </p>
+            </div>
         </div>
     </div>
 </div>
