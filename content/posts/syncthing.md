@@ -20,7 +20,7 @@ Por defecto, el ejecutable de Syncthing para Windows funciona desde consola, alm
 
 Sync Trayzor se encarga de arrancar Syncthing, vigilar su actividad y enviar notificaciones cuando tienen lugar una serie de eventos, como cambios en las carpetas locales o dispositivos que se conectan y se desconectan. Se minimiza a la bandeja del sistema, y no deja ventanas molestas en medio. Una vez instalado y configurado, nos podemos olvidar de él.
 
-La versión más reciente, compatible con sistemas de 32 y 64 bits, está aquí. Incluye instaladores y portables, y requiere .net Framework para funcionar: <https://github.com/canton7/SyncTrayzor/releases/latest>
+La versión más reciente, compatible con sistemas ARM y de 64 bits, está aquí. Incluye instaladores y portables, y requiere .net Framework para funcionar: <https://github.com/germancoding/SyncTrayzor/releases/latest>
 
 Al instalarlo y ejecutarlo, abrirá una ventana con una barra de menú. Desde Archivo > Preferencias se puede configurar todo lo necesario. Las únicas cosas que yo suelo cambiar están en la primera pestaña. Me interesa que Sync Trayzor arranque con Windows, que se minimice y se cierre a la bandeja del sistema, que arranque minimizado y que no envíe notificaciones cuando se conecta o desconecta alguien (de verdad, pueden ser muy molestas).
 
