@@ -12,22 +12,21 @@ OpenVPN es un software que nos permite construir redes vpn seguras, aprovechando
 
 ## 1. Requisitos
 
-* Un servidor con Debian instalado y acceso como root. Asumiremos que estamos usando Debian 12.
+* Un servidor con Debian instalado y acceso como root. Asumiremos que estamos usando Debian 13.
 * Conocimientos suficientes para entender lo que aparece escrito por consola, ejecutar comandos básicos y editar ficheros.
 * Leves nociones sobre arquitectura de redes: direcciones ip, máscara de subred, etc.
 * Saber cuál es la dirección ip pública del servidor o, si la tiene, su ip dentro de la red local. En este tutorial asumimos que la ip del servidor es 192.168.1.2. Puedes conocer tu dirección ip con la utilidad ifconfig.
-* Saber cuál es el nombre del adaptador de red que tiene acceso a Internet. Puede ser eth0, o tener un nombre más complejo si el servidor es físico. Asumimos enp5s0f0. Puedes conocer los nombres de tus adaptadores con la utilidad ifconfig.
+* Saber cuál es el nombre del adaptador de red que tiene acceso a Internet. Puede ser eth0, o tener un nombre más complejo si el servidor es físico. Asumimos enp5s0f0. Puedes conocer los nombres de tus adaptadores con la utilidad ip.
 
 ## 2. Instalación de OpenVPN en el servidor
 
 Para instalar la versión estable más reciente, se recomienda acudir a los repositorios de OpenVPN, en vez de descargar el paquete ofrecido por nuestra distribución. Ejecutaremos los siguientes comandos en orden:
 
 * Agregamos la clave gpg de los repositorios: `curl -fsSL https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/openvpn-repo-pkg-keyring.gpg`
-* Agregamos las URLs de los repositorios al sistema: `echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/openvpn-repo-public.gpg] http://build.openvpn.net/debian/openvpn/stable bookworm main" > /etc/apt/sources.list.d/openvpn-aptrepo.list`
+* Agregamos las URLs de los repositorios al sistema: `echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/openvpn-repo-public.gpg] http://build.openvpn.net/debian/openvpn/stable trixie main" > /etc/apt/sources.list.d/openvpn-aptrepo.list`
 * Refrescamos el índice de paquetes: `apt update`
 * Y finalmente, instalamos los paquetes que nos interesan: `apt install openvpn openvpn-dco-dkms`
-* Podemos instalar una serie de paquetes que nos vendrán bien más adelante, especialmente si queremos saber los nombres de adaptadores de red y las direcciones ip: `apt install net-tools iptables iptables-persistent`
-* El paquete net-tools contiene la utilidad ifconfig, y el resto de paquetes permiten gestionar el cortafuegos del sistema incluido en el kernel.
+* Instalamos los paquetes del cortafuegos, que más adelante vendrán bien para redirigir el tráfico de red y conservar los cambios entre reinicios: `apt install iptables iptables-persistent`
 
 ## 3. Configuración de OpenVPN como servidor
 
@@ -61,7 +60,7 @@ Si aparece un asistente interactivo, lo rellenamos con la información solicitad
 
 ### 3.3. Listas de revocación y clave extra de cifrado
 
-A veces, el certificado de un cliente puede verse comprometido, por lo que puede hacerse necesario revocar su validez. Nuestra infraestructura de clave pública debe mantener una lista actualizada con aquellos certificados que se han revocado. Debemos ejecutar el siguiente comando después de generar, renovar y revocar cualquier certificado, ya sea de servidor o de cliente:
+A veces, el certificado de un cliente puede verse comprometido, por lo que puede hacerse necesario revocar su validez. Nuestra infraestructura de clave pública debe mantener una lista actualizada con aquellos certificados que se han revocado. Debemos ejecutar el siguiente comando después de generar, renovar y revocar cualquier certificado, ya sea de servidor o de cliente. Incluso si no hay revocaciones, deberemos ejecutarlo cada 6 meses:
 `./easyrsa --vars=/etc/openvpn/certs/vars gen-crl`
 Ahora, vamos a hacer algo que le va a dar más cifrado al cifrado. Si bien es cierto que un atacante que interceptara nuestras comunicaciones lo tendría ya muy complicado para saber lo que hacemos, puede deducir que nuestro tráfico va cifrado mediante TLS. Con la clave que generaremos a continuación, ofuscaremos el tráfico TLS para que no parezca tráfico TLS:
 `openvpn --genkey tls-crypt-v2-server tls-server-key.key`
@@ -81,10 +80,6 @@ dev tun
 server 10.0.0.0 255.255.255.0
 # Protocolo de conexión. Se pueden usar TCP o UDP. Parecería que TCP es más estable, pero UDP ya tiene mecanismos equivalentes para evitar errores. Por tanto, TCP es más lento y sólo debería emplearse cuando no se pueda recurrir a UDP.
 proto udp
-# Modo rápido de entrada y salida de datos, puede acelerar las comunicaciones. Sólo en UDP
-fast-io
-# Las claves persisten en memoria y no se vuelven a leer al recibir señales del sistema
-persist-key
 # El túnel permanece abierto aunque se reciban ciertas señales del sistema
 persist-tun
 # cantidad de información que se almacena en el registro
@@ -164,9 +159,9 @@ Perfecto, nuestros clientes ya podrán acceder a Internet usando la VPN, pero s�
 ### 4.1. Generación de los certificados de cliente
 
 Supongamos que el propietario de los dos dispositivos se llama Pedro. Vamos a generar dos certificados, dos claves privadas, y dos claves de ofuscación de tipo cliente para él. En la consola, debemos navegar al directorio /etc/openvpn/certs, si es que nos habíamos salido de él. Una vez allí, ejecutamos los siguientes comandos:
-`./easyrsa --vars=/etc/openvpn/certs/vars build-client-full pedro-windows nopass inline`
-`./easyrsa --vars=/etc/openvpn/certs/vars build-client-full pedro-iphone nopass inline`
-Si aparecen asistentes interactivos solicitando información, debemos rellenarla. La opción nopass indica que las claves privadas no deben ir cifradas con contraseña. La opción inline genera un fichero de credenciales con el certificado y la clave, que podremos usar como punto de partida para construir el fichero que recibirá el cliente. En este caso, nuestros ficheros de credenciales son /etc/openvpn/certs/pki/pedro-windows.creds y pedro-iphone.creds en la misma ruta.
+`./easyrsa --vars=/etc/openvpn/certs/vars build-client-full pedro-windows nopass`
+`./easyrsa --vars=/etc/openvpn/certs/vars build-client-full pedro-iphone nopass`
+Si aparecen asistentes interactivos solicitando información, debemos rellenarla. La opción nopass indica que las claves privadas no deben ir cifradas con contraseña.
 Importante refrescar la lista de revocación en cuanto hayamos terminado esta parte.
 Para generar las claves de ofuscación de los clientes, necesitaremos hacer referencia a la clave de ofuscación del servidor. Los comandos quedarían de una forma similar a esta:
 `openvpn --tls-crypt-v2 /etc/openvpn/certs/tls-server-key.key --genkey tls-crypt-v2-client tls-client-pedro-windows.key`
@@ -185,10 +180,6 @@ A pesar de que OpenVPN se puede configurar con un archivo conf y certificados en
 ```
 # Utilizaremos el protocolo UDP
 proto udp
-# Con entrada y salida de datos rápida
-fast-io
-# Al igual que en el servidor, la clave y el túnel persisten a pesar de las señales del sistema que se reciban
-persist-key
 persist-tun
 # Servidor y puerto al que nos conectaremos
 remote midominio.com 1194
