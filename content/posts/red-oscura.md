@@ -105,20 +105,126 @@ Ahora, en NVDA, instala los complementos [TeleNVDA](https://nvda.es/2022/05/15/t
 
 ### I2P
 
-En construcción.
+I2P se define a sí mismo como "el Internet invisible". Su propósito es similar al de TOR: crear una red cifrada sobre Internet que permita una navegación anónima y privada. Sin embargo, tiene varias diferencias que debemos conocer:
 
-### Cómo usar Privoxy para conectar un navegador a TOR e I2P a la vez
+* No está pensado para visitar servicios fuera de I2P: existen algunos nodos de salida para navegar por la web, pero pueden funcionar de forma intermitente. I2P se centra más en los contenidos de la propia red I2P.
+* Es una red distribuida: mientras que TOR tiene directorios centrales, I2P dispone de una base de datos de red descentralizada a lo largo de enrutadores con buen ancho de banda, ejecutados por voluntarios y elegidos aleatoriamente por la red. Sus únicos puntos centrales son los servidores de resembrado, utilizados para conectar a la red a nuevos nodos que se ejecutan por primera vez.
+* Las direcciones de los servicios I2P son también valores hash de claves públicas, pero se pueden personalizar mucho más que las .onion. Cada enrutador I2P dispone de una libreta de direcciones, que asocia nombres de servicios a hashes de claves, similar al archivo hosts de un sistema operativo.
+* Cada usuario, por defecto, participa en la red redirigiendo tráfico de otros usuarios y formando parte de uno o varios túneles, lo que mejora el anonimato. Para ello, se cede ancho de banda de nuestra conexión. Como veremos, este comportamiento se puede desactivar para usar la red como nodo oculto. En condiciones óptimas en las que se cede ancho de banda, I2P requiere un puerto aleatorio abierto en el router. Si el router dispone de UPNP y lo tiene activado, I2P gestionará este puerto por sí mismo.
+* No hay ninguna entidad que expida certificados SSL válidos. Los certificados son menos habituales que en TOR, y están autofirmados.
 
-En construcción.
+El enrutador principal ofrecido por el proyecto I2P está programado en Java. Se trata de una solución autocontenida, más pesada que TOR, que incluye aplicaciones como un cliente de correo, un cliente BitTorrent y un servidor web propios, todos ellos centrados en preservar el anonimato y la privacidad. La consola del enrutador está traducida a español, y permite configurar, activar y desactivar módulos y túneles según sea necesario. Nuevamente, es tan extenso que no vamos a explicar todo. De hecho, puesto que la interfaz es más intuitiva y la documentación tiene una buena parte traducida, no hablaremos de cómo crear un servicio oculto propio. Veamos cómo instalarlo paso a paso en Windows.
+
+#### Instalación de Java
+
+Como todo buen software basado en Java, el primer paso para que I2P funcione es instalar Java. La versión 8, la que tradicionalmente se instala desde java.com, ya no es válida. Se necesita Java 17 o posterior. La versión actual más reciente es la 26, y su instalador se puede obtener desde el siguiente enlace:
+
+[Descarga el JDK de Java 26](https://download.oracle.com/java/26/latest/jdk-26_windows-x64_bin.exe)
+
+La instalación no tiene mucho misterio, tan sólo hay que seguir las pantallas del asistente. Si dispones de varios entornos Java, asegúrate de que Java 26 es el que se ofrece por defecto. Desde una consola, ejecuta el comando `java -version` para averiguarlo. Si aparece una versión anterior, modifica las variables de entorno del sistema, en particular path y, si existe, JAVA_HOME. Para acabar, agrega los archivos java.exe y javaw.exe al firewall de Windows para que puedan operar sin restricciones.
+
+#### Instalación de I2P
+
+I2P no es tan portable como TOR. Ofrece dos modalidades de instalador: un archivo de gran tamaño con Java incorporado y ciertos plugins de navegador, y un instalador más sencillo que depende de Java y no incorpora tantos elementos. Por suerte o por desgracia, el segundo es el más accesible, tanto durante la instalación como después, así que es el que usaremos.
+
+La versión actual de I2P es la 2.11. Puedes [descargar el instalador con este enlace directo](https://files.i2p.net/2.11.0/i2pinstall_2.11.0_windows.exe), o [visitar la página de descargas](https://i2p.net/es/downloads/) en caso de que haya una versión más reciente.
+
+El instalador es intuitivo. Tan sólo hay que seguir las pantallas del asistente, con una particularidad: en la pantalla de selección de componentes debemos buscar la tabla y marcar la casilla "Windows service". El servicio de Windows es la forma más accesible de gestionar el funcionamiento de I2P.
+
+Una vez creados los accesos directos, llegaremos a la última pantalla. Tras pulsar el botón "Hecho", el servicio se pondrá en marcha por sí solo e I2P estará listo para funcionar.
+
+Para desinstalar I2P, navega a la ruta "C:\Program Files\i2p" y ejecuta el archivo uninstall_i2p_service_winnt.bat. Esto desinstalará el servicio, al igual que install_i2p_service_winnt.bat lo reinstala de nuevo. Después, ejecuta el archivo uninstaller.jar que hay dentro de la carpeta uninstaller. Desde consola, se puede ejecutar `java -jar uninstaller.jar`. La configuración de i2p y todos los datos, por su parte, se encuentran en "C:\Program data\i2p", y deben eliminarse a mano.
+
+En cuanto a las actualizaciones, se descargan y se instalan por sí solas de forma transparente mientras el servicio esté en marcha. Es recomendable dejar encendido el gestor de torrents, ya que se usa como canal de intercambio por defecto.
+
+#### Configuración inicial de I2P
+
+Ahora que el servicio de I2P está en marcha, podemos acceder a la consola web. Para ello, se puede abrir el acceso directo "I2P router console" que hay en el escritorio o, desde un navegador, se puede visitar la siguiente dirección: <http://localhost:7657>
+
+La primera pantalla que se mostrará al entrar es la selección de idioma. Se puede omitir la configuración inicial, pero es recomendable no hacerlo y seguir el asistente hasta el final. Las pruebas de ancho de banda, si bien es cierto que también se recomiendan, pueden omitirse para no revelar a M-Lab nuestra dirección ip. Al completarlas, I2P sugerirá unos valores máximos de entrada y salida, y nos preguntará cuánto ancho de banda deseamos compartir. El valor predeterminado es 80%, pero se puede bajar al 0. No obstante, esto todavía no oculta nuestro enrutador.
+
+Para evitar formar parte de túneles de otros enrutadores, visitaremos la [página de configuración de red de la consola](http://localhost:7657/confignet), elegiremos la opción "Modo oculto - no se publica la IP (evita el tráfico participante)" y pulsaremos el botón Guardar cambios. Desde este momento, I2P ya no requiere puertos abiertos al exterior, ni usará UPNP para redirigirlos cuando esté disponible. El "modo portátil" también puede ser útil si istalamos I2P en un ordenador portátil y cambiamos con frecuencia de red.
+
+#### La libreta de direcciones
+
+El potencial de I2P radica en sus servicios ocultos. Por defecto, al igual que sucede en TOR, la dirección de un servicio oculto es el hash de una clave pública, acabado en ".b32.i2p". Por ejemplo, la dirección de la audiocinemateca en I2P es `huffwds7ecz2atf2kzljvykkazoper444ehrp5nfkgdxgzkrp2oq.b32.i2p`. Gracias a la libreta de direcciones, se puede crear un nombre más amigable, como `audiocinemateca.i2p`, mucho más sencillo de memorizar, escribir en la barra de direcciones del navegador y almacenar en marcadores.
+
+La libreta de direcciones se gestiona desde su [página correspondiente en la consola](http://localhost:7657/susidns/index). Hay cuatro tipos de libretas:
+
+* Privada: contiene un listado de direcciones que no queremos compartir con otros usuarios de I2P.
+* Local: contiene un listado de direcciones propio que se puede compartir con otros usuarios.
+* Publicada: contiene direcciones que se publican para que otros usuarios puedan sincronizar su libreta con la nuestra, siempre que estemos sirviendo un sitio web por I2P y hayamos dado permiso para compartirla. Se sincroniza con la local, pero no tiene por qué coincidir con ella.
+* Router I2P: contiene direcciones obtenidas de un servicio de suscripción.
+
+En la página de suscripciones podemos gestionar desde qué servicios se actualiza la libreta del enrutador. Por defecto se ofrece uno, mantenido por el proyecto I2P y con muy pocas entradas. A continuación dejo algunos más que se pueden agregar debajo:
+
+```
+http://notbob.i2p/hosts-all.txt
+http://reg.i2p/export/hosts-all.txt
+http://skank.i2p/hosts.txt
+http://stats.i2p/cgi-bin/newhosts.txt
+```
+
+La audiocinemateca está registrada en varios de estos servicios, por lo que tan pronto como se sincronicen, podrás entrar escribiendo `audiocinemateca.i2p` en la barra de direcciones del navegador.
+
+Existe una forma alternativa y rápida de añadir entradas si no podemos o no queremos sincronizar libretas externas. El propietario de un sitio web puede proporcionarnos un enlace como este: `http://audiocinemateca.i2p/?i2paddresshelper=huffwds7ecz2atf2kzljvykkazoper444ehrp5nfkgdxgzkrp2oq.b32.i2p`.
+
+Al visitarlo con el navegador, aparecerá una ventana de la consola preguntando qué queremos hacer. Se puede agregar la entrada a cualquiera de las libretas disponibles, o no hacer nada y simplemente navegar al destino.
+
+#### Configuración del navegador
+
+Hasta ahora, hemos configurado el enrutador de I2P, un proceso que no entraña riesgos de seguridad. Los riesgos vienen al navegar, a pesar de que el propio enrutador ofrece una serie de protecciones para mitigarlos, como la eliminación de ciertas cabeceras http. A grandes rasgos, el proceso consiste en configurar el navegador para que utilice el proxy http que hay en la dirección 127.0.0.1, puerto 4444. Sin embargo, en este apartado vamos a hacer algo más: configurar un perfil alternativo sólo para navegar por aquí, manteniendo el resto de nuestros datos bien asegurados y apartados en el perfil por defecto. El navegador, por supuesto, será Firefox en su última versión. Sigue estos pasos:
+
+1. Pulsa Windows+r para abrir el diálogo Ejecutar, escribe `firefox -p` y pulsa `intro`. Aparecerá una ventana de selección de perfil.
+2. Crea un nuevo perfil con el nombre que prefieras. Por ejemplo, puedes llamarlo i2p.
+3. Selecciona el perfil en la lista y pulsa `intro` para usarlo. Firefox arrancará como si se hubiera instalado por primera vez.
+4. Configura Firefox para que sea tan privado como permitan las opciones.
+5. Ve a los ajustes de Firefox, pulsa el botón "Configuración" que hay en la primera pantalla e indica los datos del proxy, que redirigirá tanto el tráfico http como el https. Recuerda: el host es 127.0.0.1 o localhost, y el puerto 4444.
+6. Navega por la red I2P con normalidad (y con cuidado).
+
+Para dejar de navegar por I2P, vuelve a ejecutar `firefox -p` y regresa al perfil por defecto.
+
+A continuación, enumero algunas configuraciones y consejos que pueden ser útiles para aumentar el grado de privacidad:
+
+* Instalar la extensión noscript y configurarla en modo estricto, exactamente como hicimos con Tor Browser.
+* Activar el modo permanente de navegación privada.
+* Bloquear todos los rastreadores y cookies, quitando las excepciones de la protección máxima. No te preocupes, las webs funcionarán.
+* Deshabilitar las protecciones contra software fraudulento o descargas peligrosas, así como el envío de informes de error, y la recomendación de extensiones y funciones mientras se navega. De esa forma se reduce el envío de datos a Mozilla.
+* Deshabilitar la reproducción de contenido con DRM.
+* La casilla "Pedir a los sitios web que no compartan ni vendan mis datos" parece útil, pero sólo envía una cabecera http extra, no nos aportará nada.
+* Existen ajustes adicionales para reducir nuestra exposición en general y nuestra huella de navegación, pero deben activarse en about:config.
+* Para otros servicios de I2P que no sean web, tales como correo, chat o intercambio de archivos, se recomienda usar las aplicaciones de la consola en la medida de lo posible.
+
+### Cómo usar Privoxy para conectar una aplicación a TOR e I2P a la vez
+
+Imagina un escenario más práctico y menos anónimo donde queremos que un navegador seguro, o una aplicación de otro tipo, pueda navegar por Internet con normalidad sin enrutar tráfico por Tor o I2P, pero al mismo tiempo pueda acceder a sitios .i2p y servicios .onion. Aquí entra en juego Privoxy.
+
+Privoxy es un proxy de exploración de la web sin caché, que incluye acciones y filtros para bloquear anuncios, mejorar la privacidad y editar contenido web al vuelo mientras navegamos. Para lograr el objetivo que nos hemos propuesto no editaremos filtros ni acciones, por lo que funcionará como un proxy casi neutral. Simplemente, nos apoyaremos en sus capacidades de redirigir tráfico según la URL buscada.
+
+Para instalar Privoxy en Windows, se puede [descargar la versión 4.1.0 como un archivo zip](https://www.privoxy.org/sf-download-mirror/Win32/4.1.0/privoxy_4.1.0.zip). Consulta la [página principal de Privoxy](https://www.privoxy.org/) para descargar una versión posterior, si la hay.
+
+Ahora, descomprimimos el archivo zip en una carpeta cualquiera, por ejemplo la raíz de nuestro disco duro. De esa forma, todos los ficheros del programa quedarán en `C:\privoxy_4.1.0`.
+
+El siguiente paso es editar el fichero de configuración config.txt que se encuentra en la carpeta de Privoxy. Si lo deseas, haz una copia del original por si quisieras usar Privoxy de otra manera en el futuro. El fichero debe vaciarse por completo, y quedar sólo con estas líneas:
+
+```
+forward .   .
+forward-socks5t .onion  127.0.0.1:9050    .
+forward .i2p 127.0.0.1:4444
+```
+
+Teniendo la configuración lista, instalamos el servicio. Desde una consola con privilegios de administrador navegamos a la carpeta de Privoxy. Una vez allí, ejecutamos este comando: `privoxy --install`. Aparecerá una ventana con un mensaje de confirmación, ivitándonos a entrar en la consola `services.msc` para gestionar el servicio. Y es precisamente allí donde podremos iniciarlo, sin necesidad de retoques adicionales.
+
+Para acabar, llega el turno de los clientes. Aunque no es el ideal, seguiremos poniendo como ejemplo el navegador. Si configuraste en la sección anterior un perfil de Firefox adicional, tan sólo deberás usarlo y reconfigurar el proxy en los ajustes de Firefox. Cambia el puerto 4444 por el 8118, ¡y a navegar! Podrás comprobar que accedes a cualquier web sin dificultad, y también a dominios .i2p y .onion.
 
 ### Precauciones al navegar por la red oscura
 
-Al navegar por Internet existen multitud de peligros, y en la red oscura no es una excepción. A todos los ataques habituales debemos sumar uno más: la gente va a actuar de forma proactiva para averiguar quién eres: desde el dueño de un servicio oculto que quiera conocer a sus clientes, hasta los operadores de telefonía o las autoridades. De hecho, saber quién eres puede llegar a ser incluso más importante que saber qué haces. Aunque no te importe que se sepa tu identidad y hagas cosas dentro de la ley, conviene que tengas en cuenta lo siguiente:
+Al navegar por Internet existen multitud de peligros, y la red oscura no es una excepción. A todos los ataques habituales debemos sumar uno más: la gente va a actuar de forma proactiva para averiguar quién eres: desde el dueño de un servicio oculto que quiera conocer a sus clientes, hasta los operadores de telefonía o las autoridades. De hecho, saber quién eres puede llegar a ser incluso más importante que saber qué haces. Aunque no te importe que se sepa tu identidad y hagas cosas dentro de la ley, conviene que tengas en cuenta lo siguiente:
 
 * Los scripts son un vector de ataque: me gusta decir que la web oscura es el reino de los elementos nativos. Una buena web en un servicio oculto debe tener Javascript como algo, si acaso, opcional si quiere dar un buen servicio a sus visitantes. Angular, React y cualquier otro framework están fuera de lugar aquí.
 * El tamaño de pantalla, las media queries de css, la carga de contenido multimedia en un formato específico, e incluso las cabeceras http pueden contener elementos dirigidos a identificarte. Algo tan simple como una hoja de estilos que diferencie entre enlaces visitados o no visitados puede lanzar una conexión con una URL concreta y decirle al dueño del servicio que ya has estado ahí.
 * Por tanto, además de Javascript, se recomienda desactivar también el historial y las cookies.
-* Si necesitas habilitar todo o parte de lo anterior, asegúrate de que el servicio es de confianza, y rebaja las protecciones sólo para ese servicio.
+* Si necesitas habilitar todo o parte de lo anterior, asegúrate de que el servicio es de confianza, y rebaja las protecciones sólo para ese servicio, por ejemplo añadiéndolo como excepción en las opciones del navegador.
 * Usa siempre un navegador suficientemente seguro, como TOR Browser. Evita navegadores basados en Chromium, como Brave. Aunque estén preparados para TOR y lo lleven incorporado, envían más telemetría y datos por ahí fuera de los que deben.
 * No utilices estas tecnologías en empresas o equipos de empresa. Los antivirus suelen reaccionar mal, el personal de seguridad también, y el de recursos humanos probablemente también.
 * Ten respeto, pero no miedo. No hay que bajar la guardia en estas redes, pero tampoco asustarse. Si realmente te asusta entrar en este terreno o no crees tener los conocimientos suficientes, lo mejor es que no toques.
@@ -132,3 +238,8 @@ Para ti, como usuario, ningún cambio perceptible. Desde la configuración de pe
 
 * [Artículo de TOR en la Wikipedia](https://es.wikipedia.org/wiki/Tor_(red_de_anonimato))
 * [Acerca de TOR en la web del proyecto](https://support.torproject.org/es/about-tor/)
+* [Página principal de I2P](https://i2p.net/es/)
+* [Documentación de I2P](https://i2p.net/es/docs/)
+* [Página principal de Privoxy](https://www.privoxy.org/)
+* [Manual de usuario de Privoxy](https://www.privoxy.org/user-manual/index.html)
+* [Fichero de configuración priv-config usado en Mastodon](https://github.com/mastodon/mastodon/blob/main/priv-config)
