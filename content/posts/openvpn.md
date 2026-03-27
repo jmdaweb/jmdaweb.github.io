@@ -15,7 +15,7 @@ OpenVPN es un software que nos permite construir redes vpn seguras, aprovechando
 * Un servidor con Debian instalado y acceso como root. Asumiremos que estamos usando Debian 13.
 * Conocimientos suficientes para entender lo que aparece escrito por consola, ejecutar comandos básicos y editar ficheros.
 * Leves nociones sobre arquitectura de redes: direcciones ip, máscara de subred, etc.
-* Saber cuál es la dirección ip pública del servidor o, si la tiene, su ip dentro de la red local. En este tutorial asumimos que la ip del servidor es 192.168.1.2. Puedes conocer tu dirección ip con la utilidad ifconfig.
+* Saber cuál es la dirección ip pública del servidor o, si la tiene, su ip dentro de la red local. En este tutorial asumimos que la ip del servidor es 192.168.1.2. Puedes conocer tu dirección ip con la utilidad ip.
 * Saber cuál es el nombre del adaptador de red que tiene acceso a Internet. Puede ser eth0, o tener un nombre más complejo si el servidor es físico. Asumimos enp5s0f0. Puedes conocer los nombres de tus adaptadores con la utilidad ip.
 
 ## 2. Instalación de OpenVPN en el servidor
@@ -70,16 +70,18 @@ Con todo esto, estamos preparados para elaborar un fichero de configuración de 
 
 Como hemos mencionado anteriormente, OpenVPN puede ejecutar tantas instancias de cliente y servidor como sea necesario. Cada instancia usa su propio fichero de configuración. Para facilitar la diferenciación entre clientes y servidores, los ficheros de cliente se almacenan en /etc/openvpn/client, y los ficheros de servidor en /etc/openvpn/server. Los ficheros que se usan para configurar OpenVPN en modo conexión punto a punto pueden ir fuera de estas carpetas. Sin embargo, todos deben tener la extensión .conf. A continuación, vamos a crear un fichero en /etc/openvpn/server. Lo llamaremos servidor.conf. Encima de cada línea, hay comentarios explicando su propósito.
 ```
-# Indicamos cuál es la ip del servidor, ya sea pública o dentro de una red de área local
-local 192.168.1.2
-# Puerto en el que escucha el servidor. Debe estar abierto en el router o firewall de la NAT, si lo hay, así como en el firewall del sistema
-port 1194
+# Indicamos cuál es la ip del servidor, ya sea pública o dentro de una red de área local, 
+# seguida del puerto en el que escucha el servidor. Debe estar abierto en el router o firewall de la NAT, si lo hay, así como en el firewall del sistema, 
+# y finalmente el protocolo de conexión. Se pueden usar TCP o UDP. Parecería que TCP es más estable, pero UDP ya tiene mecanismos equivalentes para evitar errores. Por tanto, TCP es más lento y sólo debería emplearse cuando no se pueda recurrir a UDP.
+local 192.168.1.2 1194 udp
+# Podemos escuchar en todas las direcciones comentando  la línea anterior y usando esta otra
+#local * 1194 udp
+# Además, se puede acompañar de otra para tcp
+#local * 1194 tcp-server
 # Dispositivo que se utilizará. El más sencillo es tun. Por su parte, tap proporciona una integración con la lan a más bajo nivel, pero su configuración es mucho más compleja
 dev tun
 # Parámetros del servidor: formato de la subred y máscara de subred. Los clientes que se conecten recibirán una ip en este rango. Cuidado, la subred de la VPN no debe coincidir con la subred del servidor. De lo contrario, podemos perder el contacto con la máquina.
 server 10.0.0.0 255.255.255.0
-# Protocolo de conexión. Se pueden usar TCP o UDP. Parecería que TCP es más estable, pero UDP ya tiene mecanismos equivalentes para evitar errores. Por tanto, TCP es más lento y sólo debería emplearse cuando no se pueda recurrir a UDP.
-proto udp
 # El túnel permanece abierto aunque se reciban ciertas señales del sistema
 persist-tun
 # cantidad de información que se almacena en el registro
@@ -139,11 +141,11 @@ plugin /usr/lib/openvpn/openvpn-plugin-auth-pam.so "login login USERNAME passwor
 Ahora que ya tenemos un fichero de configuración completo, estamos listos para iniciar el servidor VPN. Podemos hacerlo con este comando: `systemctl start openvpn-server@servidor`
 Lo que va después del símbolo arroba es, como se puede deducir, el nombre del fichero de configuración, sin la extensión .conf.
 Con este otro comando, configuraremos el servidor para que arranque al iniciar el sistema: `systemctl enable openvpn-server@servidor`
-Pero ahora nos enfrentamos a un problema: esta red va a dejar a los clientes sin acceso a Internet. Podrán verse unos a otros e interactuar entre sí, pero no podrán usar el servidor para comunicarse con el exterior. Para resolverlo, editaremos el fichero /etc/sysctl.conf o, si es posible, crearemos un fichero .conf nuevo en /etc/sysctl.d con el nombre que queramos. Lo único que se debe hacer, independientemente de la opción elegida, es descomentar o escribir la siguiente línea y guardar los cambios:
+Pero ahora nos enfrentamos a un problema: esta red va a dejar a los clientes sin acceso a Internet. Podrán verse unos a otros e interactuar entre sí, pero no podrán usar el servidor para comunicarse con el exterior. Para resolverlo, crearemos un fichero .conf nuevo en /etc/sysctl.d con el nombre que queramos, por ejemplo openvpn.conf:
 ```
-net.ipv4.ip_forward=1
+echo net.ipv4.ip_forward=1 >> /etc/sysctl.d/openvpn.conf
 ```
-Podemos reiniciar el servidor para que los cambios surtan efecto, o ejecutar el comando `sysctl -p` para aplicarlos de inmediato.
+Podemos reiniciar el servidor para que los cambios surtan efecto.
 Esto, sin embargo, no es suficiente. Hay que indicar a iptables que el tráfico recibido de la red interna se dirija a la red externa. Si prefieres usar UFW, puedes hacerlo. El comando con iptables sería el siguiente:
 ```
 # Recuerda ajustar tu subred y tu adaptador con los valores que correspondan
@@ -180,6 +182,8 @@ A pesar de que OpenVPN se puede configurar con un archivo conf y certificados en
 ```
 # Utilizaremos el protocolo UDP
 proto udp
+# o, si lo preferimos, el protocolo TCP
+#proto tcp-client
 persist-tun
 # Servidor y puerto al que nos conectaremos
 remote midominio.com 1194
