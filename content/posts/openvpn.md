@@ -82,6 +82,8 @@ local 192.168.1.2 1194 udp
 dev tun
 # Parámetros del servidor: formato de la subred y máscara de subred. Los clientes que se conecten recibirán una ip en este rango. Cuidado, la subred de la VPN no debe coincidir con la subred del servidor. De lo contrario, podemos perder el contacto con la máquina.
 server 10.0.0.0 255.255.255.0
+# Parámetros del servidor, pero con una subred IPV6
+server-ipv6 fe80::/64
 # El túnel permanece abierto aunque se reciban ciertas señales del sistema
 persist-tun
 # cantidad de información que se almacena en el registro
@@ -129,7 +131,7 @@ topology subnet
 # Transmitimos a los clientes directivas de configuración. Todo el tráfico irá dirigido por la VPN
 push "redirect-gateway"
 # Nuestro router, que incluye un servidor DNS, actuará como DNS
-push "dhcp-option DNS 192.168.1.1"
+push "dns server 0 address 192.168.1.1"
 # Algoritmos de cifrado de transmisión de datos
 data-ciphers AES-256-GCM:AES-128-GCM:CHACHA20-POLY1305
 # Además de la autentificación de cliente con certificado, también se debe introducir un usuario y una contraseña
